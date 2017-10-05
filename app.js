@@ -7,6 +7,7 @@
 
 
 const https = require('https');
+const api = require('./api');
 
 let location, apiKey;
 
@@ -15,8 +16,8 @@ function convertToCelsius(kelvin) {
 	return celsius;
 }
 
-function getWeather(apiKey, location) {
-	https.get(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${apiKey}`, (res) => {
+function getWeather(api, location) {
+	https.get(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${api.key}`, (res) => {
 	let body = "";
 	res.on('data', (data) => {
 		body += data.toString();
@@ -33,7 +34,7 @@ function getWeather(apiKey, location) {
 }
 
 // User input to arguments
-apiKey = process.argv.slice(2,3);
-location = process.argv.slice(3,4);
+// apiKey = process.argv.slice(2,3);
+location = process.argv.slice(2,3);
 
-getWeather(apiKey, location);
+getWeather(api, location);
