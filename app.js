@@ -9,7 +9,7 @@
 const https = require('https');
 const api = require('./api');
 
-let location, apiKey;
+let location;
 
 function convertToCelsius(kelvin) {
 	celsius = kelvin - 273.15
@@ -33,8 +33,6 @@ function getWeather(api, location) {
 	});
 }
 
-// User input to arguments
-// apiKey = process.argv.slice(2,3);
 location = process.argv.slice(2,3);
 
 getWeather(api, location);
