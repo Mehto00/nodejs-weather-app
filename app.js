@@ -8,17 +8,23 @@
 
 const https = require('https');
 
-let apiKey,latitude, longitude;
+let location, apiKey;
 
-function getWeather(apiKey, latitude, longitude) {
-	https.get(`https://api.darksky.net/forecast/${apiKey}/${latitude},${longitude}`, (res) => {
+function convertToCelsius(kelvin) {
+	celsius = kelvin - 273.15
+	return celsius;
+}
+
+function getWeather(apiKey, location) {
+	https.get(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${apiKey}`, (res) => {
 	let body = "";
 	res.on('data', (data) => {
 		body += data.toString();
 
 	}).on('end', () => {
 		const weatherData = JSON.parse(body);
-		console.log(weatherData.currently);
+		let celsius = convertToCelsius(weatherData.main.temp);
+		console.log(`The temperature in ${location} is currently ${celsius.toFixed(1)} degrees celsius`);
 	});
 
 	}).on('error', (e) => {
@@ -28,7 +34,6 @@ function getWeather(apiKey, latitude, longitude) {
 
 // User input to arguments
 apiKey = process.argv.slice(2,3);
-latitude = process.argv.slice(3,4);
-longitude = process.argv.slice(4,5);
+location = process.argv.slice(3,4);
 
-getWeather(apiKey, latitude, longitude);
+getWeather(apiKey, location);
