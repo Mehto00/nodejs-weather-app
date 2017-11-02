@@ -7,9 +7,16 @@
 
 
 const https = require('https');
-const api = require('./api');
+const readline = require('readline');
+var fs = require('fs');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 let location = "Helsinki"; // Set default location to Helsinki
+let api ="";
 
 function convertToCelsius(kelvin) {
 	celsius = kelvin - 273.15
@@ -22,7 +29,7 @@ function formatInputStyle(userInput) {
 }
 
 function getWeather(api, location) {
-	https.get(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${api.key}`, (res) => {
+	https.get(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${api}`, (res) => {
 		let body = "";
 		
 		res.on('data', (data) => {
@@ -47,13 +54,32 @@ function getWeather(api, location) {
 	});
 } 
 
-// Update location if given and format style 
-if (process.argv.slice(2,3) != "") {
-	location = process.argv.slice(2,3);
-	location = formatInputStyle(location.toString());
+// If file does not exist asks user for a openweathermap api key and save it
+if (!fs.existsSync('apikey.txt')) {
+	rl.question('Please provide your openweathermap.org api key\n(for more information checkout http://openweathermap.org/appid): ', (api) => {
+	  
+	  	fs.writeFile("apikey.txt", api, function(err) {
+		    if(err) {
+		        return console.log("Problem with saving the file: " + err);
+		    }
+	    	console.log("Api-key was saved!");
+		}); 
+		rl.close();
+	});
 }
 
-getWeather(api, location);
+fs.readFile('apikey.txt', 'utf8', function(error, data) {
+	if (error) {
+		throw error;
+	}
+	api = data;
+})
 
+// Ask user for a location and format input style 
+rl.question('Input city name for a weather search: ', (location) => {  
+	rl.close();
+	location = formatInputStyle(location.toString());
+	getWeather(api, location);
+});
 
 
